@@ -21,7 +21,7 @@ class Transfer{
 
     public function doTransfer(string $targetNumber, string $amount){
         $response["accBalance"] = 0;
-        $response = array("isError" => true);
+        $response["isError"] = true;
         if (!preg_match('/^[0-9]*$/',$this->srcNumber) || !preg_match('/^[0-9]*$/',$targetNumber)) {
             $response["message"] = "หมายเลขบัญชีต้องเป็นตัวเลขเท่านั้น";
         } elseif (!preg_match('/^[0-9]*$/',$amount)) {
@@ -44,7 +44,6 @@ class Transfer{
                     $response["message"] = "คุณมียอดเงินในบัญชีไม่เพียงพอ";
                 } else {
                     $withdrawResult = $this->withdraw($srcAccount['accNo'], $amount);
-    
                     $depositResult = $this->deposit($desAccount['accNo'], $amount);
 
                     if ($depositResult['isError'] || $withdrawResult['isError']) {
