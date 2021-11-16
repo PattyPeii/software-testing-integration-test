@@ -1,74 +1,11 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-include __DIR__."/../src/transfer/transfer.php";
+require_once ('_DIR__."/../src/transfer/transfer.php"');
 use Operation\transfer;
 
 
-class TestTransferStubAll extends transfer{
-
-    public function accountAuthenticationProvider(string $accNo): array {
-        if ($accNo == '9999999990')
-        {
-            $output = [
-                'accNo' => $accNo,
-                'accName' => 'Nobita',
-                'accBalance' => -1
-            ];
-        }
-        elseif ($accNo == '9999999991')
-        {
-            $output = [
-                'accNo' => $accNo,
-                'accName' => 'Nobita',
-                'accBalance' => -1
-            ];
-        }
-        elseif ($accNo == '0000000000') {
-            throw new Exception("Account number : {$accNo} not found.");
-        }
-        else
-        {
-            $output = [
-                'accNo' => $accNo,
-                'accName' => 'Nobita',
-                'accBalance' => 1000000
-            ];
-        }
-        return $output;
-    }
-
-    public function withdraw(string $accNo, string $amount): array 
-    {
-        $response = [
-            'accNo' => $accNo,
-            'accName' => 'account name',
-            'accBalance' => 1000000 - $amount,
-            'isError' => false,
-            'message' => '',
-        ];
-        
-        return $response;
-    }
-
-    public function deposit(string $accNo, string $amount): array 
-    {
-        $isError = $amount == 900000;
-        $response = [
-            'accNo' => $accNo,
-            'accName' => 'account name',
-            'accBalance' => 1000000 + $amount,
-            'isError' => $isError,
-            'message' => '',
-        ];
-        
-        return $response;
-    }
-
-    
-}
-
-class TransferTestStubAll_01Test extends TestCase
+class TransferTestNoStub_04Test extends TestCase
 {
     /**
 	* add DataProvider
@@ -79,7 +16,7 @@ class TransferTestStubAll_01Test extends TestCase
     public function test($srcAccNo, $srcAccBalance, $targetNumber, $targetAmount, $expected)
 	{
         $srcAccName = 'Test Test';
-        $transfer = new TestTransferStubAll($srcAccNo, $srcAccName);
+        $transfer = new transfer($srcAccNo, $srcAccName);
         $response = $transfer->doTransfer($targetNumber, $targetAmount);
         
         $this->assertSame($expected, $response['message']);
@@ -99,6 +36,8 @@ class TransferTestStubAll_01Test extends TestCase
 
             ['4312531892', 9900900, '4312531892', 100, 'ไม่สามารถโอนไปบัญชีตัวเองได้'], // TC-TF-006
 
+            ['4312531892', 9900900, '0000000000', 100, 'Account number : 0000000000 not found.'], // TC-TF-007
+
             ['4312531892', 9900900, '1234567890', 9999999, 'คุณมียอดเงินในบัญชีไม่เพียงพอ'], // TC-TF-008
 
             ['4312531892', 9900900, '7234153321', 900000, 'ดำเนินการไม่สำเร็จ'], // TC-TF-009
@@ -107,25 +46,5 @@ class TransferTestStubAll_01Test extends TestCase
         ];
 	}
     
-    /**
-	* add DataProvider
-	*
-	* @dataProvider dataProvider2
-	*
-	*/
-    public function test_exception($srcAccNo, $srcAccBalance, $targetNumber, $targetAmount)
-    {
-        $this->expectException(Exception::class);
-
-        $srcAccName = 'Test Test';
-        $tran = new TestTransferStubAll($srcAccNo, $srcAccName);
-
-        $tran->doTransfer($targetNumber, $targetAmount);
-    }
-
-    public function dataProvider2() {
-		return [
-            ['4312531892', 9900900, '0000000000', 100, 'err'], // TC-TF-007
-        ];
-	}
+    
 }
