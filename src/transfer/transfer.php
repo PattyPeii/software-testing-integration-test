@@ -2,8 +2,6 @@
 
 require_once __DIR__."./../../src/deposit/DepositService.php";
 require_once __DIR__."./../../src/withdraw/Withdrawal.php";
-// require_once __DIR__."./../../src/withdraw/StubWithdrawal.php";
-// require_once __DIR__."./../../src/deposit/StubDeposit.php";
 require_once __DIR__."./../serviceauthentication/serviceauthentication.php";
 require_once __DIR__."./../serviceauthentication/AccountInformationException.php";
 require_once __DIR__."./../serviceauthentication/DBConnection.php";
@@ -12,10 +10,8 @@ use ServiceAuthentication;
 use Operation\DepositService;
 use Operation\Withdrawal;
 use AccountInformationException;
-// use Stub\StubWithdrawal;
-// use Stub\StubDeposit;
 
-class transfer{
+class Transfer{
     private $srcNumber,$srcName;
 
     public function __construct(string $srcNumber,string $srcName){
@@ -23,21 +19,7 @@ class transfer{
         $this->srcName = $srcName;
     }
 
-    public function DriverMain(){
-        
-        $srcAccNo =  '3455677565';
-        $srcAccName = 'Omar Reilly';
-        $tran = new transfer($srcAccNo,$srcAccName);
-        $srcAccBalance = 500000;
-
-        $targetNumber = '1234567890';
-        $targetAmount = 5000000;
-
-        $tran->doTransfer($targetNumber,$targetAmount);
-    }
-
     public function doTransfer(string $targetNumber, string $amount){
-
         $response["accBalance"] = 0;
         $response = array("isError" => true);
         if (!preg_match('/^[0-9]*$/',$this->srcNumber) || !preg_match('/^[0-9]*$/',$targetNumber)) {
@@ -61,11 +43,10 @@ class transfer{
                 if ($srcAccount['accBalance'] - (int)$amount < 0) {
                     $response["message"] = "คุณมียอดเงินในบัญชีไม่เพียงพอ";
                 } else {
-                    $withdraw = new Withdrawal($srcAccount['accNo']);
-                    $withdrawResult = $withdraw->withdraw($amount);
+                    $withdrawResult = $this->withdraw($srcAccount['accNo'], $amount);
+    
+                    $depositResult = $this->deposit($desAccount['accNo'], $amount);
 
-                    $deposit =  new DepositService($desAccount['accNo']);
-                    $depositResult = $deposit->deposit($amount);
                     if ($depositResult['isError'] || $withdrawResult['isError']) {
                         $response['message'] = "ดำเนินการไม่สำเร็จ";
                     } else {
@@ -86,14 +67,16 @@ class transfer{
     {
         return  ServiceAuthentication::accountAuthenticationProvider($acctNum);
     }
-    public function deposit(string $amount):array
+
+    public function withdraw(string $acctNum, string $amount) : array
     {
-        return  StubDeposit::deposit($amount);
+        $service = new Withdrawal($acctNum);
+        return $service->withdraw($amount);
     }
 
-    public function withdraw(string $amount):array
+    public function deposit(string $acctNum, string $amount) : array
     {
-        return  StubWithdrawal::withdraw($amount);
+        $service = new DepositService($acctNum);
+        return $service->deposit($amount);
     }
-
 }
