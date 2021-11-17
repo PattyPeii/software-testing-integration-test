@@ -5,38 +5,7 @@ require_once ('_DIR__."/../src/transfer/transfer.php"');
 use Operation\transfer;
 
 
-class TestTransferStubAll extends transfer{
-
-    public function accountAuthenticationProvider(string $accNo): array {
-        if ($accNo == '9999999990')
-        {
-            $output = [
-                'accNo' => $accNo,
-                'accName' => 'Nobita',
-                'accBalance' => -1
-            ];
-        }
-        elseif ($accNo == '9999999991')
-        {
-            $output = [
-                'accNo' => $accNo,
-                'accName' => 'Nobita',
-                'accBalance' => -1
-            ];
-        }
-        elseif ($accNo == '0000000000') {
-            throw new AccountInformationException("Account number : {$accNo} not found.");
-        }
-        else
-        {
-            $output = [
-                'accNo' => $accNo,
-                'accName' => 'Nobita',
-                'accBalance' => 9900900
-            ];
-        }
-        return $output;
-    }
+class TestTransferStubDepWit extends transfer{
 
     public function withdraw(string $accNo, string $amount): array 
     {
@@ -68,7 +37,7 @@ class TestTransferStubAll extends transfer{
     
 }
 
-class TransferTestStubAll_01Test extends TestCase
+class TransferTestStubDepWit_02Test extends TestCase
 {
     /**
 	* add DataProvider
@@ -79,7 +48,7 @@ class TransferTestStubAll_01Test extends TestCase
     public function test($srcAccNo, $srcAccBalance, $targetNumber, $targetAmount, $expectedMsg, $isError, $accBalance=0)
 	{
         $srcAccName = 'Test Test';
-        $transfer = new TestTransferStubAll($srcAccNo, $srcAccName);
+        $transfer = new TestTransferStubDepWit($srcAccNo, $srcAccName);
         $response = $transfer->doTransfer($targetNumber, $targetAmount);
         
         $this->assertSame($expectedMsg, $response['message']);
@@ -91,7 +60,7 @@ class TransferTestStubAll_01Test extends TestCase
 		return [
             ['4312531892', 9900900, 'abcdefghij', 100, 'หมายเลขบัญชีต้องเป็นตัวเลขเท่านั้น', true], // TC-TF-001
             ['4312531892', 9900900, '1234567890', 'abcd', 'จำนวนเงินต้องเป็นตัวเลขเท่านั้น', true], // TC-TF-002
-            ['4312531892', 9900900, '01234567890', 100, 'หมายเลขบัญชีต้องมีจำนวน 10 หลัก', true], // TC-TF-003
+            ['4312531892', 9900900, '012345678', 100, 'หมายเลขบัญชีต้องมีจำนวน 10 หลัก', true], // TC-TF-003
             ['4312531892', 9900900, '1234567890', 0, 'ยอดการโอนต้องมากกว่า 0 บาท', true], // TC-TF-004
             ['4312531892', 9900900, '1234567890', 10000000, 'ยอดการโอนต้องไม่มากกว่า 9,999,999 บาท', true], // TC-TF-005
             ['4312531892', 9900900, '4312531892', 100, 'ไม่สามารถโอนไปบัญชีตัวเองได้', true], // TC-TF-006
@@ -101,5 +70,5 @@ class TransferTestStubAll_01Test extends TestCase
             ['4312531892', 9900900, '1234567890', 100, '', false, 9900800], // TC-TF-010
         ];
 	}
-    
+  
 }

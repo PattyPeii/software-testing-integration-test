@@ -5,20 +5,7 @@ require_once ('_DIR__."/../src/transfer/transfer.php"');
 use Operation\transfer;
 
 
-class TestTransferStubDepWit extends transfer{
-
-    public function withdraw(string $accNo, string $amount): array 
-    {
-        $response = [
-            'accNo' => $accNo,
-            'accName' => 'account name',
-            'accBalance' => 9900900 - $amount,
-            'isError' => false,
-            'message' => '',
-        ];
-        
-        return $response;
-    }
+class TestTransferStubDep extends transfer{
 
     public function deposit(string $accNo, string $amount): array 
     {
@@ -37,7 +24,7 @@ class TestTransferStubDepWit extends transfer{
     
 }
 
-class TransferTestStubDepWit_02Test extends TestCase
+class TransferTestStubDep_03Test extends TestCase
 {
     /**
 	* add DataProvider
@@ -48,7 +35,7 @@ class TransferTestStubDepWit_02Test extends TestCase
     public function test($srcAccNo, $srcAccBalance, $targetNumber, $targetAmount, $expectedMsg, $isError, $accBalance=0)
 	{
         $srcAccName = 'Test Test';
-        $transfer = new TestTransferStubDepWit($srcAccNo, $srcAccName);
+        $transfer = new TestTransferStubDep($srcAccNo, $srcAccName);
         $response = $transfer->doTransfer($targetNumber, $targetAmount);
         
         $this->assertSame($expectedMsg, $response['message']);
@@ -60,7 +47,7 @@ class TransferTestStubDepWit_02Test extends TestCase
 		return [
             ['4312531892', 9900900, 'abcdefghij', 100, 'หมายเลขบัญชีต้องเป็นตัวเลขเท่านั้น', true], // TC-TF-001
             ['4312531892', 9900900, '1234567890', 'abcd', 'จำนวนเงินต้องเป็นตัวเลขเท่านั้น', true], // TC-TF-002
-            ['4312531892', 9900900, '01234567890', 100, 'หมายเลขบัญชีต้องมีจำนวน 10 หลัก', true], // TC-TF-003
+            ['4312531892', 9900900, '012345678', 100, 'หมายเลขบัญชีต้องมีจำนวน 10 หลัก', true], // TC-TF-003
             ['4312531892', 9900900, '1234567890', 0, 'ยอดการโอนต้องมากกว่า 0 บาท', true], // TC-TF-004
             ['4312531892', 9900900, '1234567890', 10000000, 'ยอดการโอนต้องไม่มากกว่า 9,999,999 บาท', true], // TC-TF-005
             ['4312531892', 9900900, '4312531892', 100, 'ไม่สามารถโอนไปบัญชีตัวเองได้', true], // TC-TF-006
@@ -70,5 +57,5 @@ class TransferTestStubDepWit_02Test extends TestCase
             ['4312531892', 9900900, '1234567890', 100, '', false, 9900800], // TC-TF-010
         ];
 	}
-  
+    
 }

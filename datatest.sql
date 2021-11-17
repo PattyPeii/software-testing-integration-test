@@ -14,7 +14,7 @@ VALUES
 
 INSERT INTO ACCOUNT(no,pin,name,balance,waterCharge,electricCharge,phoneCharge) 
 VALUES
-('9876543210','1234','Topfee','100','0','0','0');
+('9876543210','1234','Topfee','100','0','0','0'),
 ('3455677565','4321','Metavy','30','0','0','0');
 
 INSERT INTO ACCOUNT(no,pin,name,balance,waterCharge,electricCharge,phoneCharge) 
